@@ -68,7 +68,7 @@ function buildRollups(doc: any, combinations: string[]): void {
     if (!!docRollups) {
       collections[collection][id].count +=1
     } else {
-      collections[collection][id] = { count: 1, payload }
+      collections[collection][id] = { count: 1, doc }
     }
   })
 
@@ -88,8 +88,54 @@ async function readDocsAndBuildRollups(): Promise<void> {
   }
 }
 
+
+function top5Assets(): any[] {
+  const assets = collections.asset;
+  const assetsCandidates = Object.keys(assets).map((id) => ({id, count: assets[id].count, doc: assets[id].doc }));
+
+  return assetsCandidates.sort((a, b) => b.count - a.count).slice(0, 5).map(a => [a.count, a.doc.asset]);
+}
+
+function top10DeviceRegion(): any[] {
+  const  deviceRegions = collections["device.region"];
+  const deviceRegionsCandidates = Object.keys(deviceRegions).map((id) => ({ id, count: deviceRegions[id].count, doc: deviceRegions[id].doc }));
+
+  return deviceRegionsCandidates.sort((a, b) => b.count - a.count).slice(0, 10).map(a => [a.count, a.doc.device, a.doc.region]);
+}
+
+function top10AssetMonth(): any[] {
+  const collection = collections["asset.month"];
+  const collectionCandidates = Object
+    .keys(collection)
+    .map((id) => ({ id, count: collection[id].count, doc: collection[id].doc }))
+    .filter(e => ["January", "February", "March"].includes(e.doc.month));
+
+  return collectionCandidates.sort((a, b) => b.count - a.count).slice(0, 10).map(a => [a.count, a.doc.asset, a.doc.month]);
+}
+
+function top10AssetMonth2(): any[] {
+  const collection = collections["asset.month"];
+  const collectionCandidates = Object
+    .keys(collection)
+    .map((id) => ({ id, count: collection[id].count, doc: collection[id].doc }));
+
+  return collectionCandidates.sort((a, b) => b.count - a.count).slice(0, 10).map(a => [a.count, a.doc.asset, a.doc.month]);
+}
+
+
 (async function () {
   await  readDocsAndBuildRollups();
-  //console.log(collections);
+  // console.log(collections)
+  console.log("top 5 by Assets");
+  console.log(top5Assets())
+
+  console.log("top 10 by Device and Region");
+  console.log(top10DeviceRegion())
+
+  console.log("top 10 by Asset and month between January and March");
+  console.log(top10AssetMonth())
+
+  console.log("top 10 by Asset and month");
+  console.log(top10AssetMonth2())
 })()
 
