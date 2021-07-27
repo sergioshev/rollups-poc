@@ -1,5 +1,4 @@
 import faker from "faker";
-import fs from "fs";
 import { FileHandle, open } from "fs/promises";
 
 import { DIMENSIONS, DOCS_NUMBER } from "./config";

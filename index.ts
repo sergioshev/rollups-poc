@@ -3,7 +3,7 @@ import readline from "readline";
 import md5 from "md5";
 import { sha512_256 } from "js-sha512"
 
-import { DIMENSIONS } from "./config";
+import getCombinations from "./combinations";
 
 let collections: any = {}
 
@@ -18,19 +18,7 @@ let collections: any = {}
 //   return combinations;
 // }
 
-function generateCombinations2(startingIndex: number, total: number, combination: string[] = []): string[] {
-  const combinations: string[] = [];
-
-  if (combination.length > 0) combinations.push(combination.join("."));
-
-  for (let j = startingIndex; j < total; j++) {
-    combinations.push(...generateCombinations2(j + 1, total, [...combination, DIMENSIONS[j]]));
-  }
-
-  return combinations;
-}
-
-const combinations = generateCombinations2(0, DIMENSIONS.length);
+const combinations = getCombinations();
 
 combinations.forEach((combination: string) => {
   collections[combination] = { };
@@ -38,7 +26,7 @@ combinations.forEach((combination: string) => {
 
 function generateDocId(doc: any, combination: string): { id: string, payload: string } {
   const keys = combination.split(".");
-  let payload = keys.sort().map(key => `${doc[key]}`).join();
+  let payload = keys.sort().map(key => `${doc[key] || ''}`).join();
   payload = payload.toLowerCase();
   payload = payload.replace(/[^a-z0-9@.-]/, '');
     
@@ -125,7 +113,7 @@ function top10AssetMonth2(): any[] {
 
 (async function () {
   await  readDocsAndBuildRollups();
-  // console.log(collections)
+  console.log(collections)
   console.log("top 5 by Assets");
   console.log(top5Assets())
 
